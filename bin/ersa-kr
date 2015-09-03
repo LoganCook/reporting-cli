@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+"""Kafka-Reporting CLI"""
+
+import argparse
+
+import requests
+
+import kafka_reporting.hello_world.cli as hello_world
+import kafka_reporting.archive.cli as archive
+import kafka_reporting.nova.cli as nova
+import kafka_reporting.cinder.cli as cinder
+import kafka_reporting.keystone.cli as keystone
+import kafka_reporting.swift.cli as swift
+import kafka_reporting.ceilometer.cli as ceilometer
+import kafka_reporting.status.cli as status
+import kafka_reporting.get.cli as get
+
+SUBS = [get, archive, hello_world, nova, cinder, keystone, swift, ceilometer,
+        status]
+
+if __name__ == "__main__":
+    PARSER = argparse.ArgumentParser(
+        description="Kafka Reporting: produce, consume, ...")
+
+    PARSER.add_argument(
+        "--insecure",
+        help="Skip HTTPS certificate verification.",
+        action="store_true")
+
+    SUBPARSERS = PARSER.add_subparsers(help='Subcommand help')
+
+    for sub in SUBS:
+        parser = SUBPARSERS.add_parser(sub.COMMAND, help=sub.DESCRIPTION)
+        sub.setup(parser)
+        parser.set_defaults(func=sub.execute)
+
+    ARGS = PARSER.parse_args()
+
+    if ARGS.insecure:
+        requests.packages.urllib3.disable_warnings()
+
+    if "func" in ARGS:
+        ARGS.func(ARGS)
+    else:
+        PARSER.print_help()
