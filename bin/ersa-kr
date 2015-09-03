@@ -5,15 +5,15 @@ import argparse
 
 import requests
 
-import kafka_reporting.hello_world.cli as hello_world
-import kafka_reporting.archive.cli as archive
-import kafka_reporting.nova.cli as nova
-import kafka_reporting.cinder.cli as cinder
-import kafka_reporting.keystone.cli as keystone
-import kafka_reporting.swift.cli as swift
-import kafka_reporting.ceilometer.cli as ceilometer
-import kafka_reporting.status.cli as status
-import kafka_reporting.get.cli as get
+import ersa_reporting_kafka.hello_world.cli as hello_world
+import ersa_reporting_kafka.archive.cli as archive
+import ersa_reporting_kafka.nova.cli as nova
+import ersa_reporting_kafka.cinder.cli as cinder
+import ersa_reporting_kafka.keystone.cli as keystone
+import ersa_reporting_kafka.swift.cli as swift
+import ersa_reporting_kafka.ceilometer.cli as ceilometer
+import ersa_reporting_kafka.status.cli as status
+import ersa_reporting_kafka.get.cli as get
 
 SUBS = [get, archive, hello_world, nova, cinder, keystone, swift, ceilometer,
         status]
