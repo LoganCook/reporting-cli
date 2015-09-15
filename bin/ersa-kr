@@ -14,9 +14,10 @@ import ersa_reporting_kafka.swift.cli as swift
 import ersa_reporting_kafka.ceilometer.cli as ceilometer
 import ersa_reporting_kafka.status.cli as status
 import ersa_reporting_kafka.get.cli as get
+import ersa_reporting_kafka.crm.cli as crm
 
 SUBS = [get, archive, hello_world, nova, cinder, keystone, swift, ceilometer,
-        status]
+        status, crm]
 
 if __name__ == "__main__":
     PARSER = argparse.ArgumentParser(
