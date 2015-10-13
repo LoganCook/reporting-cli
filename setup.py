@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="ersa-reporting-kafka",
-    version="0.2",
+    version="0.2.1",
     install_requires=["arrow", "requests", "python-swiftclient",
                       "python-keystoneclient", "python-cinderclient",
                       "python-novaclient", "python-ceilometerclient",

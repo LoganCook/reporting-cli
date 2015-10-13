@@ -44,12 +44,13 @@ def _extract_contacts(raw):
     contacts = []
 
     for contact in raw:
-        username = [custom["FIELD_VALUE"] for custom in contact["CUSTOMFIELDS"]
-                    if custom["CUSTOM_FIELD_ID"] == "CONTACT_FIELD_5"]
+        usernames = [custom["FIELD_VALUE"]
+                     for custom in contact["CUSTOMFIELDS"]
+                     if custom["CUSTOM_FIELD_ID"] == "CONTACT_FIELD_5"]
 
-        username = username[0] if (len(username) > 0) else None
+        username = usernames[0].lower() if (len(usernames) > 0) else None
 
-        email = [info["DETAIL"] for info in contact["CONTACTINFOS"]
+        email = [info["DETAIL"].lower() for info in contact["CONTACTINFOS"]
                  if info["TYPE"] == "EMAIL"]
 
         links = [link["ORGANISATION_ID"] for link in contact["LINKS"]
