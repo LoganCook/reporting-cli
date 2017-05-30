@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 """
 Archive messages from the kafka-reporting API into OpenStack Swift.
 """
@@ -6,15 +6,21 @@ Archive messages from the kafka-reporting API into OpenStack Swift.
 # pylint: disable=import-error,too-many-arguments
 # pylint: disable=import-self,too-few-public-methods
 
+import base64
+import hashlib
 import io
 import json
 import re
 
-import swiftclient
-
 from backports import lzma
+from boto.s3.connection import S3Connection
 
 from .. import api
+
+# HCP #facepalm
+import ssl
+if hasattr(ssl, '_create_unverified_context'):
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 REPORTING_RETRY_LIMIT = 10
 
@@ -44,39 +50,45 @@ class Dump:
 
 
 class Archive:
-    """Handle all interactions (save, list) with Swift."""
+    """Handle all interactions (save, list) with Object Store through Boto."""
 
-    re_offset = re.compile("[0-9]+")
+    # clustername/topic/partition/offset1-offset2.json.xz
+    re_offset = re.compile(r".*/[0-9]+-([0-9]+)\..+")
 
-    def __init__(self, swift_config, container, object_prefix=""):
-        self.swift = swiftclient.client.Connection(**swift_config)
-        self.container = container
+    def __init__(self, aws_id, aws_secret, server, bucket, object_prefix=""):
+        aws_id = base64.b64encode(aws_id)
+        aws_secret = hashlib.md5(aws_secret).hexdigest()
+        hs3 = S3Connection(aws_access_key_id=aws_id,
+                           aws_secret_access_key=aws_secret,
+                           host=server)
+        self.bucket = hs3.get_bucket(bucket)
         self.object_prefix = object_prefix
 
         if len(object_prefix) > 0 and not object_prefix.endswith("/"):
             self.object_prefix += "/"
 
     def save(self, topic, partition, start_offset, end_offset, content):
-        """Save an object in Swift."""
+        """Save an object in object store."""
         dump_name = "%s%s/%s/%s-%s.json.xz" % (
             self.object_prefix, topic, partition, str(start_offset).zfill(12),
             str(end_offset).zfill(12))
 
-        self.swift.put_object(self.container, dump_name, content)
+        self.bucket.new_key(dump_name).set_contents_from_string(content)
 
     def latest(self, topic, partition):
-        """Find the highest kafka-reporting offset in Swift."""
-        list_all = self.swift.get_container(
-            self.container,
-            prefix="%s%s/%i/" % (self.object_prefix, topic, partition),
-            full_listing=True)
-        list_names = [_["name"] for _ in list_all[1]]
-        end_offsets = [int(self.re_offset.findall(_)[-1]) for _ in list_names]
+        """Find the highest kafka-reporting offset in object store."""
+        list_all = self.bucket.list("%s%s/%i/" % (
+            self.object_prefix, topic, partition))
 
-        if len(end_offsets) == 0:
-            return 0
-        else:
-            return max(end_offsets)
+        end_offset = 0
+        for item in list_all:
+            try:
+                offset = int(self.re_offset.match(item.name).group(1))
+                if offset > end_offset:
+                    end_offset = offset
+            except AttributeError:
+                pass
+        return end_offset
 
 
 class Stream:

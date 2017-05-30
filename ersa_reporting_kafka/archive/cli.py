@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Archive messages from the kafka-reporting API into OpenStack Swift.
+Archive messages from the kafka-reporting API into object store on HCP.
 """
 
 # pylint: disable=import-self
@@ -8,11 +8,11 @@ Archive messages from the kafka-reporting API into OpenStack Swift.
 import sys
 import os
 
-from .. import REQUIRED_ENVIRONMENT_REPORTING, REQUIRED_ENVIRONMENT_OPENSTACK
+from .. import REQUIRED_ENVIRONMENT_REPORTING, REQUIRED_ENVIRONMENT_HCP
 from . import Archive, Stream
 
 COMMAND = "archive"
-DESCRIPTION = "Consumer: archive content into swift."
+DESCRIPTION = "Consumer: archive content into object store."
 
 
 def setup(subparser):
@@ -24,12 +24,12 @@ def setup(subparser):
                            type=int,
                            required=True,
                            help="kafka-reporting partition")
-    subparser.add_argument("--container",
+    subparser.add_argument("--namespace",
                            required=True,
-                           help="swift container")
+                           help="HCP namespace")
     subparser.add_argument("--prefix",
                            default="",
-                           help="swift object prefix (default '')")
+                           help="object prefix (default '')")
     subparser.add_argument("--offset",
                            type=int,
                            help="override start offset (default automatic)")
@@ -39,7 +39,7 @@ def execute(args):
     """Archive CLI execution."""
     missing_environment = [
         var for var in (REQUIRED_ENVIRONMENT_REPORTING +
-                        REQUIRED_ENVIRONMENT_OPENSTACK)
+                        REQUIRED_ENVIRONMENT_HCP)
         if var not in os.environ
     ]
 
@@ -47,15 +47,14 @@ def execute(args):
         sys.exit("Missing environment variables: %s" %
                  " ".join(missing_environment))
 
-    swift_config = {
-        "auth_version": 2,
-        "authurl": os.getenv("OS_AUTH_URL"),
-        "user": os.getenv("OS_USERNAME"),
-        "key": os.getenv("OS_PASSWORD"),
-        "tenant_name": os.getenv("OS_TENANT_NAME")
-    }
-
-    archive = Archive(swift_config, args.container, args.prefix)
+    hcp_id = os.getenv("OS_HCP_ID")
+    hcp_secret = os.getenv("OS_HCP_SECRET")
+    hcp_server = os.getenv("OS_HCP_URL")
+    archive = Archive(hcp_id,
+                      hcp_secret,
+                      hcp_server,
+                      args.namespace,
+                      args.prefix)
 
     stream_config = {
         "server": os.getenv("REPORTING_SERVER"),

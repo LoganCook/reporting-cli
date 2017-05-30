@@ -1,10 +1,11 @@
 arrow
 backports.lzma
+boto
+pytz
 python-ceilometerclient
 python-cinderclient
 python-keystoneclient
 python-novaclient
 python-swiftclient
 requests
-pytz
 tabulate
