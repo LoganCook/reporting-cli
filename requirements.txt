@@ -6,5 +6,5 @@ python-keystoneclient
 python-novaclient
 python-swiftclient
 requests
-swift>=2.0.0
+pytz
 tabulate
