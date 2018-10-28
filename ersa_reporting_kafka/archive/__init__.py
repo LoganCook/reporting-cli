@@ -6,8 +6,6 @@ Archive messages from the kafka-reporting API into OpenStack Swift.
 # pylint: disable=import-error,too-many-arguments
 # pylint: disable=import-self,too-few-public-methods
 
-import base64
-import hashlib
 import io
 import json
 import re
