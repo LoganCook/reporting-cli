@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Archive messages from the kafka-reporting API into object store on HCP.
+Archive messages from the kafka-reporting API into object store on AWS.
 """
 
 # pylint: disable=import-self
@@ -8,7 +8,7 @@ Archive messages from the kafka-reporting API into object store on HCP.
 import sys
 import os
 
-from .. import REQUIRED_ENVIRONMENT_REPORTING, REQUIRED_ENVIRONMENT_HCP
+from .. import REQUIRED_ENVIRONMENT_REPORTING, REQUIRED_ENVIRONMENT_AWS
 from . import Archive, Stream
 
 COMMAND = "archive"
@@ -26,7 +26,7 @@ def setup(subparser):
                            help="kafka-reporting partition")
     subparser.add_argument("--namespace",
                            required=True,
-                           help="HCP namespace")
+                           help="AWS namespace")
     subparser.add_argument("--prefix",
                            default="",
                            help="object prefix (default '')")
@@ -39,7 +39,7 @@ def execute(args):
     """Archive CLI execution."""
     missing_environment = [
         var for var in (REQUIRED_ENVIRONMENT_REPORTING +
-                        REQUIRED_ENVIRONMENT_HCP)
+                        REQUIRED_ENVIRONMENT_AWS)
         if var not in os.environ
     ]
 
@@ -47,12 +47,12 @@ def execute(args):
         sys.exit("Missing environment variables: %s" %
                  " ".join(missing_environment))
 
-    hcp_id = os.getenv("OS_HCP_ID")
-    hcp_secret = os.getenv("OS_HCP_SECRET")
-    hcp_server = os.getenv("OS_HCP_URL")
-    archive = Archive(hcp_id,
-                      hcp_secret,
-                      hcp_server,
+    aws_id = os.getenv("OS_AWS_ID")
+    aws_secret = os.getenv("OS_AWS_SECRET")
+    aws_server = os.getenv("OS_AWS_URL")
+    archive = Archive(aws_id,
+                      aws_secret,
+                      aws_server,
                       args.namespace,
                       args.prefix)
 

@@ -54,10 +54,10 @@ class Archive:
     re_offset = re.compile(r".*/[0-9]+-([0-9]+)\..+")
 
     def __init__(self, aws_id, aws_secret, server, bucket, object_prefix=""):
-        hs3 = S3Connection(aws_access_key_id=aws_id,
-                           aws_secret_access_key=aws_secret,
-                           host=server)
-        self.bucket = hs3.get_bucket(bucket)
+        aws_s3 = S3Connection(aws_access_key_id=aws_id,
+                              aws_secret_access_key=aws_secret,
+                              host=server)
+        self.bucket = aws_s3.get_bucket(bucket)
         self.object_prefix = object_prefix
 
         if len(object_prefix) > 0 and not object_prefix.endswith("/"):

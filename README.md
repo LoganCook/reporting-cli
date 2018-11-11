@@ -18,9 +18,9 @@ Run this command to install them:
 1. Openstack related with prefix of `OS_`:
 
     OS_AUTH_URL, OS_USERNAME, OS_PASSWORD, OS_TENANT_NAME
-1. Object store - HCP related with prefix of `OS_HCP_`:
+1. Object store - AWS related with prefix of `OS_AWS_`:
 
-    OS_HCP_ID, OS_HCP_SECRET, OS_HCP_URL
+    OS_AWS_ID, OS_AWS_SECRET, OS_AWS_URL
 
 ## Run command `ersa-kr`
 The supported Python version is 2. Most common usages:

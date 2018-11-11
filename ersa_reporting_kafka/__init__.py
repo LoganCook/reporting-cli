@@ -15,7 +15,7 @@ REQUIRED_ENVIRONMENT_OPENSTACK = [
     for suffix in ["AUTH_URL", "USERNAME", "PASSWORD", "TENANT_NAME"]
 ]
 
-REQUIRED_ENVIRONMENT_HCP = [
-    "OS_HCP_%s" % suffix
+REQUIRED_ENVIRONMENT_AWS = [
+    "OS_AWS_%s" % suffix
     for suffix in ["ID", "SECRET", "URL"]
 ]
