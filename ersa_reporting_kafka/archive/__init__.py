@@ -15,11 +15,6 @@ from boto.s3.connection import S3Connection
 
 from .. import api
 
-# HCP #facepalm
-import ssl
-if hasattr(ssl, '_create_unverified_context'):
-    ssl._create_default_https_context = ssl._create_unverified_context
-
 REPORTING_RETRY_LIMIT = 10
 
 
